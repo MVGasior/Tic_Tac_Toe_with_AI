@@ -55,26 +55,15 @@ class TicTacToe:
                     print('Bad parameters!')
 
     def game_navigation(self):
-        if self.active_player == self.player1:
-            if self.player1 == 'user':
-                move = self.next_move()
-                self.making_move(move[0], move[1])
-            elif self.player1 == 'easy':
-                self.easy_ai_move()
-            elif self.player1 == 'medium':
-                self.medium_ai_move()
-            elif self.player1 == 'hard':
-                self.hard_ai_move()
-        elif self.active_player == self.player2:
-            if self.player2 == 'user':
-                move = self.next_move()
-                self.making_move(move[0], move[1])
-            elif self.player2 == 'easy':
-                self.easy_ai_move()
-            elif self.player2 == 'medium':
-                self.medium_ai_move()
-            elif self.player2 == 'hard':
-                self.hard_ai_move()
+        if self.player1 == 'user' or self.player2 == 'user':
+            move = self.next_move()
+            self.making_move(move[0], move[1])
+        elif self.player1 == 'easy' or self.player2 == 'easy':
+            self.easy_ai_move()
+        elif self.player1 == 'medium' or self.player2 == 'medium':
+            self.medium_ai_move()
+        elif self.player1 == 'hard' or self.player2 == 'hard':
+            self.hard_ai_move()
 
     def display_field(self) -> None:
         boarder = ['-' * 9]
@@ -164,37 +153,18 @@ class TicTacToe:
             else:
                 return 0
 
-    def medium_strategy_player2(self) -> tuple:
-        #Looking for O's combination
+    def medium_strategy_player(self, num) -> tuple:
         for i in range(3):
-            if np.count_nonzero(self.layout[i] == 1) == 2 and 0 in self.layout[i]:
+            if np.count_nonzero(self.layout[i] == num) == 2 and 0 in self.layout[i]:
                 b = np.where(self.layout[i] == 0)[0][0]
                 return i, b
-            elif np.count_nonzero(np.rot90(self.layout)[i] == 1) == 2 and 0 in np.rot90(self.layout)[i]:
+            elif np.count_nonzero(np.rot90(self.layout)[i] == num) == 2 and 0 in np.rot90(self.layout)[i]:
                 a = np.where(np.rot90(self.layout)[i] == 0)[0][0]
                 return a, (2 - i)
-        if np.count_nonzero(self.layout.diagonal() == 1) == 2 and 0 in self.layout.diagonal():
+        if np.count_nonzero(self.layout.diagonal() == num) == 2 and 0 in self.layout.diagonal():
             a = np.where(self.layout.diagonal() == 0)[0][0]
             return a, a
-        elif np.count_nonzero(np.fliplr(self.layout).diagonal() == 1) == 2 and 0 in np.fliplr(self.layout).diagonal():
-            a = np.where(np.fliplr(self.layout).diagonal() == 0)[0][0]
-            return a, (2 - a)
-        else:
-            return None
-
-    def medium_strategy_player1(self) -> tuple:
-        #Looking for X's combination
-        for i in range(3):
-            if np.count_nonzero(self.layout[i] == 2) == 2 and 0 in self.layout[i]:
-                b = np.where(self.layout[i] == 0)[0][0]
-                return i, b
-            elif np.count_nonzero(np.rot90(self.layout)[i] == 2) == 2 and 0 in np.rot90(self.layout)[i]:
-                a = np.where(np.rot90(self.layout)[i] == 0)[0][0]
-                return a, (2 - i)
-        if np.count_nonzero(self.layout.diagonal() == 2) == 2 and 0 in self.layout.diagonal():
-            a = np.where(self.layout.diagonal() == 0)[0][0]
-            return a, a
-        elif np.count_nonzero(np.fliplr(self.layout).diagonal() == 2) == 2 and 0 in np.fliplr(self.layout).diagonal():
+        elif np.count_nonzero(np.fliplr(self.layout).diagonal() == num) == 2 and 0 in np.fliplr(self.layout).diagonal():
             a = np.where(np.fliplr(self.layout).diagonal() == 0)[0][0]
             return a, (2 - a)
         else:
@@ -202,43 +172,20 @@ class TicTacToe:
 
     def easy_ai_move(self):
         print('Making move level "easy"')
-        while True:
-            a = rd.randint(0, 2)
-            b = rd.randint(0, 2)
-            if self.layout[a][b] == 0:
-                self.making_move(a, b)
-                break
-            else:
-                continue
+        move = rd.choice(self.get_possible_moves(self.layout))
+        self.making_move(move[0], move[1])
 
     def medium_ai_move(self):
         print('Making move level "medium"')
-        move_1 = self.medium_strategy_player1()
-        move_2 = self.medium_strategy_player2()
-        if self.active_player == self.player1:
-            if self.player1 == 'medium' and move_1 is not None:
-                move = move_1
-            elif self.player1 == 'medium' and move_1 is None and move_2 is not None:
-                move = move_2
-            else:
-                while True:
-                    a = rd.randint(0, 2)
-                    b = rd.randint(0, 2)
-                    if self.layout[a][b] == 0:
-                        move = (a, b)
-                        break
+        move_1, move_2 = self.medium_strategy_player(2), self.medium_strategy_player(1)
+        if (self.player1 == 'medium' and move_1 is not None) or \
+                (self.player2 == 'medium' and move_2 is None and move_1 is not None):
+            move = move_1
+        elif (self.player1 == 'medium' and move_1 is None and move_2 is not None) or \
+                (self.player2 == 'medium' and move_2 is not None):
+            move = move_2
         else:
-            if self.player2 == 'medium' and move_2 is not None:
-                move = self.medium_strategy_player2()
-            elif self.player2 == 'medium' and move_2 is None and move_1 is not None:
-                move = self.medium_strategy_player1()
-            else:
-                while True:
-                    a = rd.randint(0, 2)
-                    b = rd.randint(0, 2)
-                    if self.layout[a][b] == 0:
-                        move = (a, b)
-                        break
+            move = rd.choice(self.get_possible_moves(self.layout))
         self.making_move(move[0], move[1])
 
     @staticmethod
@@ -266,4 +213,3 @@ class TicTacToe:
 
 if __name__ == "__main__":
     TicTacToe().choose_game_mode()
-
