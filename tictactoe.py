@@ -10,8 +10,10 @@ import math
 class TicTacToe:
     def __init__(self):
         self.layout = np.zeros((3, 3))
+        #self.layout = np.array([[2, 1, 0],
+                                #[1, 1, 2],
+                                #[2, 0, 0]])
         self.temp_layout = np.array([])
-        self.num = 0
         self.num_o = 0
         self.num_x = 0
         self.temp_num_o = 0
@@ -243,10 +245,10 @@ class TicTacToe:
         return max(scores) if turn else min(scores)
 
     def undo(self, move):
-        if self.temp_layout[move[0]][move[1]] == '1':
+        if self.temp_layout[move[0]][move[1]] == 1:
             self.temp_layout[move[0]][move[1]] = 0
             self.temp_num_o -= 1
-        elif self.temp_layout[move[0]][move[1]] == '2':
+        elif self.temp_layout[move[0]][move[1]] == 2:
             self.temp_layout[move[0]][move[1]] = 0
             self.temp_num_x -= 1
 
