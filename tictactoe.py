@@ -10,9 +10,6 @@ import math
 class TicTacToe:
     def __init__(self):
         self.layout = np.zeros((3, 3))
-        #self.layout = np.array([[2, 1, 0],
-                                #[1, 1, 2],
-                                #[2, 0, 0]])
         self.temp_layout = np.array([])
         self.num_o = 0
         self.num_x = 0
@@ -58,7 +55,7 @@ class TicTacToe:
                 else:
                     print('Bad parameters!')
 
-    def game_navigation(self):
+    def game_navigation(self) -> None:
         if self.active_player == 'user':
             self.next_move()
         elif self.active_player == 'easy':
@@ -133,33 +130,23 @@ class TicTacToe:
                 self.temp_num_o += 1
 
     @staticmethod
-    def check_result(layout, simulation=False):
+    def check_result(layout, simulation=False) -> int:
         for i in range(3):
-            if all(layout[i] == 2) or all(np.rot90(layout)[i] == 2):
+            if all(layout[i] == 2) or all(np.rot90(layout)[i] == 2) or all(layout.diagonal() == 2) or\
+                    all(np.fliplr(layout).diagonal() == 2):
                 if not simulation:
                     print("X wins")
                     exit()
                 else:
                     return 10
-            elif all(layout[i] == 1) or all(np.rot90(layout)[i] == 1):
+            elif all(layout[i] == 1) or all(np.rot90(layout)[i] == 1) or all(layout.diagonal() == 1) or\
+                    all(np.fliplr(layout).diagonal() == 1):
                 if not simulation:
                     print("O wins")
                     exit()
                 else:
                     return -10
-        if all(layout.diagonal() == 2) or all(np.fliplr(layout).diagonal() == 2):
-            if not simulation:
-                print("X wins")
-                exit()
-            else:
-                return 10
-        elif all(layout.diagonal() == 1) or all(np.fliplr(layout).diagonal() == 1):
-            if not simulation:
-                print("O wins")
-                exit()
-            else:
-                return -10
-        elif not 0 in layout:
+        if not 0 in layout:
             if not simulation:
                 print("Draw")
                 exit()
@@ -203,12 +190,7 @@ class TicTacToe:
 
     @staticmethod
     def get_possible_moves(temp_layout):
-        possible_moves = []
-        for x in range(0, 3):
-            for y in range(0, 3):
-                if temp_layout[x][y] == 0:
-                    possible_moves.append((x, y))
-        return possible_moves
+        return [(x, y) for x in range(0, 3) for y in range(0, 3) if temp_layout[x][y] == 0]
 
     def hard_ai_move(self):
         print('Making move level "hard"')
@@ -217,8 +199,7 @@ class TicTacToe:
         self.temp_num_x = self.num_x
         best_score = -math.inf
         best_move = None
-        board = self.get_possible_moves(self.temp_layout)
-        for move in board:
+        for move in self.get_possible_moves(self.temp_layout):
             self.making_move(move[0], move[1], True)
             score = self.minimax_algorithm(False)
             self.undo(move)
@@ -228,15 +209,14 @@ class TicTacToe:
         self.temp_layout = np.array([])
         self.making_move(best_move[0], best_move[1])
 
-    def minimax_algorithm(self, turn):
-        board = self.get_possible_moves(self.temp_layout)
+    def minimax_algorithm(self, turn) -> int:
         state = self.check_result(self.temp_layout, True)
         if self.player1 == 'hard' and state is not None:
             return state
         elif self.player2 == 'hard' and state is not None:
             return -state
         scores = []
-        for move in board:
+        for move in self.get_possible_moves(self.temp_layout):
             self.making_move(move[0], move[1], True)
             scores.append(self.minimax_algorithm(not turn))
             self.undo(move)
@@ -246,11 +226,10 @@ class TicTacToe:
 
     def undo(self, move):
         if self.temp_layout[move[0]][move[1]] == 1:
-            self.temp_layout[move[0]][move[1]] = 0
             self.temp_num_o -= 1
         elif self.temp_layout[move[0]][move[1]] == 2:
-            self.temp_layout[move[0]][move[1]] = 0
             self.temp_num_x -= 1
+        self.temp_layout[move[0]][move[1]] = 0
 
 
 if __name__ == "__main__":
