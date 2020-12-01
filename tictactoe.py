@@ -1,12 +1,6 @@
-# After all add to the __init__
-#       print('''To activate game choose insert start and what users will play.
-#                 E.g. 'start user easy' - means player 1 will be human and player 2 will be easy computer.
-#                You can simulate game of two computers or you can play multiplayer
-#                Coordinates looks like below:
-#                (1,3) (2,3) (3,3)
-#                (1,2) (2,2) (3,2)
-#                (1,1) (2,1) (3,1)
-#       ''')
+# This is game Tic-Tac-Toe with Minimax algorithm as a hard levle
+# Author : Mateusz Gąsior
+
 
 import numpy as np
 import random as rd
@@ -26,9 +20,9 @@ class TicTacToe:
                          E.g. 'start user easy' - means player 1 will be human and player 2 will be easy computer.
                         You can simulate game of two computers or you can play multiplayer
                         Coordinates looks like below:
-                        (1,3) (2,3) (3,3)
-                        (1,2) (2,2) (3,2)
-                        (1,1) (2,1) (3,1)
+                        (0,0) (0,1) (0,2)
+                        (1,0) (1,1) (1,2)
+                        (2,0) (2,1) (2,2)
         ''')
 
     def choose_game_mode(self):
@@ -55,14 +49,14 @@ class TicTacToe:
                     print('Bad parameters!')
 
     def game_navigation(self):
-        if self.player1 == 'user' or self.player2 == 'user':
+        if self.active_player == 'user':
             move = self.next_move()
             self.making_move(move[0], move[1])
-        elif self.player1 == 'easy' or self.player2 == 'easy':
+        elif self.active_player == 'easy':
             self.easy_ai_move()
-        elif self.player1 == 'medium' or self.player2 == 'medium':
+        elif self.active_player == 'medium':
             self.medium_ai_move()
-        elif self.player1 == 'hard' or self.player2 == 'hard':
+        elif self.active_player == 'hard':
             self.hard_ai_move()
 
     def display_field(self) -> None:
@@ -88,8 +82,8 @@ class TicTacToe:
             if len(move) != 2:
                 raise ValueError
             else:
-                index_a = (-1) * (int(move[1]) - 3)
-                index_b = int(move[0]) - 1
+                index_a = int(move[1])
+                index_b = int(move[0])
                 if not (0 <= index_a < 3 and 0 <= index_b < 3):
                     raise BufferError
                 elif self.layout[index_a][index_b] != 0:
