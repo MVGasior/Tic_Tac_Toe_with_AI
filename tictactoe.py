@@ -25,9 +25,9 @@ class TicTacToe:
                         You can simulate game of two computers (only level easy and medium)
                         or you can play multiplayer. There are three levels available : easy, medium and hard
                         Coordinates look like below:
-                        (0,0) (0,1) (0,2)
-                        (1,0) (1,1) (1,2)
-                        (2,0) (2,1) (2,2)
+                        (0,0) (1,0) (2,0)
+                        (0,1) (1,1) (2,1)
+                        (0,2) (1,2) (2,2)
                     
                     Have a nice game!
         ''')
@@ -206,8 +206,6 @@ class TicTacToe:
         return possible_moves
 
     def hard_ai_move(self):
-        print("In progress")
-        exit()
         self.temp_layout = self.layout
         self.temp_num_o = self.num_o
         self.temp_num_x = self.num_x
@@ -215,7 +213,7 @@ class TicTacToe:
         best_move = None
         for move in self.get_possible_moves(self.temp_layout):
             self.making_move(move[0], move[1], True)
-            score = self.minimax_algorithm()
+            score = self.minimax_algorithm(False)
             self.temp_layout[move[0]][move[1]] = 0
             if score > best_score:
                 best_move = move
@@ -225,9 +223,7 @@ class TicTacToe:
         self.temp_num_o = 0
         self.making_move(best_move[0], best_move[1])
 
-    def minimax_algorithm(self):
-        print("In progress")
-        exit()
+    def minimax_algorithm(self, turn):
         state = self.check_result(self.temp_layout, True)
         if self.player1 == 'hard' and state is not None:
             return state
@@ -236,11 +232,11 @@ class TicTacToe:
         scores = []
         for move in self.get_possible_moves(self.temp_layout):
             self.making_move(move[0], move[1], True)
-            scores.append(self.minimax_algorithm(self.temp_layout))
+            scores.append(self.minimax_algorithm(not turn))
             self.temp_layout[move[0]][move[1]] = 0
-            if (isMaxTurn and max(scores) == 10) or (not isMaxTurn and min(scores) == -10):
+            if (turn and max(scores) == 10) or (not turn and min(scores) == -10):
                 break
-        return max(scores) if isMaxTurn else min(scores)
+        return max(scores) if turn else min(scores)
 
 
 if __name__ == "__main__":
