@@ -4,25 +4,32 @@
 
 import numpy as np
 import random as rd
+import math
 
 
 class TicTacToe:
     def __init__(self):
         self.layout = np.zeros((3, 3))
+        self.temp_layout = np.array([])
         self.num_o = 0
         self.num_x = 0
+        self.temp_num_o = 0
+        self.temp_num_x = 0
         self.display = []
         self.player1 = ''
         self.player2 = ''
         self.active_player = ''
         self.levels = ['user', 'easy', 'medium', 'hard']
-        print('''To activate game choose insert start and what users will play.
+        print('''To activate game insert start and what users will play first and second.
                          E.g. 'start user easy' - means player 1 will be human and player 2 will be easy computer.
-                        You can simulate game of two computers or you can play multiplayer
-                        Coordinates looks like below:
+                        You can simulate game of two computers (only level easy and medium)
+                        or you can play multiplayer. There are three levels available : easy, medium and hard
+                        Coordinates look like below:
                         (0,0) (0,1) (0,2)
                         (1,0) (1,1) (1,2)
                         (2,0) (2,1) (2,2)
+                    
+                    Have a nice game!
         ''')
 
     def choose_game_mode(self):
@@ -50,8 +57,7 @@ class TicTacToe:
 
     def game_navigation(self):
         if self.active_player == 'user':
-            move = self.next_move()
-            self.making_move(move[0], move[1])
+            self.next_move()
         elif self.active_player == 'easy':
             self.easy_ai_move()
         elif self.active_player == 'medium':
@@ -98,50 +104,58 @@ class TicTacToe:
             print("This cell is occupied! Choose another one!")
             self.next_move()
         finally:
-            return index_a, index_b
+            self.making_move(index_a, index_b)
 
-    def making_move(self, pos_a, pos_b):
-        if self.num_x <= self.num_o:
-            self.layout[pos_a][pos_b] = 2
-            self.num_x += 1
-            self.active_player = self.player2
+    def making_move(self, pos_a, pos_b, simulation=False):
+        if not simulation:
+            if self.num_x <= self.num_o:
+                self.layout[pos_a][pos_b] = 2
+                self.num_x += 1
+                self.active_player = self.player2
+            else:
+                self.layout[pos_a][pos_b] = 1
+                self.num_o += 1
+                self.active_player = self.player1
+            self.display_field()
+            self.check_result(self.layout)
+            self.game_navigation()
         else:
-            self.layout[pos_a][pos_b] = 1
-            self.num_o += 1
-            self.active_player = self.player1
-        self.display_field()
-        self.check_result(self.layout)
-        self.game_navigation()
+            if self.temp_num_x <= self.temp_num_o:
+                self.temp_layout[pos_a][pos_b] = 2
+                self.temp_num_x += 1
+            else:
+                self.temp_layout[pos_a][pos_b] = 1
+                self.temp_num_o += 1
 
     @staticmethod
-    def check_result(layout, last_check=True):
+    def check_result(layout, simulation=False):
         for i in range(3):
             if all(layout[i] == 2) or all(np.rot90(layout)[i] == 2):
-                if last_check:
+                if not simulation:
                     print("X wins")
                     exit()
                 else:
                     return 10
             elif all(layout[i] == 1) or all(np.rot90(layout)[i] == 1):
-                if last_check:
+                if not simulation:
                     print("O wins")
                     exit()
                 else:
                     return -10
         if all(layout.diagonal() == 2) or all(np.fliplr(layout).diagonal() == 2):
-            if last_check:
+            if not simulation:
                 print("X wins")
                 exit()
             else:
                 return 10
         elif all(layout.diagonal() == 1) or all(np.fliplr(layout).diagonal() == 1):
-            if last_check:
+            if not simulation:
                 print("O wins")
                 exit()
             else:
                 return -10
         elif not 0 in layout:
-            if last_check:
+            if not simulation:
                 print("Draw")
                 exit()
             else:
@@ -192,17 +206,41 @@ class TicTacToe:
         return possible_moves
 
     def hard_ai_move(self):
-        temp_layout = self.layout
-        print("In progrss")
+        print("In progress")
         exit()
-        move = self.minimax_algorithm(temp_layout)
+        self.temp_layout = self.layout
+        self.temp_num_o = self.num_o
+        self.temp_num_x = self.num_x
+        best_score = -math.inf
+        best_move = None
+        for move in self.get_possible_moves(self.temp_layout):
+            self.making_move(move[0], move[1], True)
+            score = self.minimax_algorithm()
+            self.temp_layout[move[0]][move[1]] = 0
+            if score > best_score:
+                best_move = move
+                best_score = score
+        self.temp_layout = np.array([])
+        self.temp_num_x = 0
+        self.temp_num_o = 0
+        self.making_move(best_move[0], best_move[1])
 
-    def minimax_algorithm(self, temp_layout):
-        print("In progrss")
-        possible_moves = self.get_possible_moves(temp_layout)
-        value = self.check_result(temp_layout, False)
-        return a, b
+    def minimax_algorithm(self):
+        print("In progress")
         exit()
+        state = self.check_result(self.temp_layout, True)
+        if self.player1 == 'hard' and state is not None:
+            return state
+        elif self.player2 == 'hard' and state is not None:
+            return -state
+        scores = []
+        for move in self.get_possible_moves(self.temp_layout):
+            self.making_move(move[0], move[1], True)
+            scores.append(self.minimax_algorithm(self.temp_layout))
+            self.temp_layout[move[0]][move[1]] = 0
+            if (isMaxTurn and max(scores) == 10) or (not isMaxTurn and min(scores) == -10):
+                break
+        return max(scores) if isMaxTurn else min(scores)
 
 
 if __name__ == "__main__":
