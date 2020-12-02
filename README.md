@@ -1,4 +1,4 @@
-Tic Tac Toe with AI
+# Tic Tac Toe with AI
 
 Tic Tac Toe game with 3 levels to chose.
 Easy is based on randomly made move.
