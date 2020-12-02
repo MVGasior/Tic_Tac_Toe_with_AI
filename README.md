@@ -1,7 +1,7 @@
 # Tic Tac Toe with AI
 
 
-This Tic Tac Toe is built on **NumPy** and the hardest level is using **Minimax algorithm**
+This Tic Tac Toe is built on **NumPy** and the hardest level is using **Minimax algorithm with Alpha-beta Pruning**
 
 [More details](https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-1-introduction/)
 
